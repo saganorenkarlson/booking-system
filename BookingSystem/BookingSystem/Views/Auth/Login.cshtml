@@ -1,0 +1,68 @@
+﻿@{
+    ViewData["Title"] = "Login";
+}
+
+
+@{
+    var userEmail = Context.Session.GetString("currentUser");
+    var errorMsg = TempData["error"];
+}
+
+<head>
+<meta property="og:description" content="@ViewBag.Meta.Description">
+<meta property="og:site_name" content="@ViewBag.Meta.Sitename">
+<meta property="og:article:published_time" content="@ViewBag.Meta.PublicedDate">
+<meta property="og:locale" content="@ViewBag.Meta.Locale">
+<meta property="og:type" content="@ViewBag.Meta.ContentType">
+
+</head>
+
+
+<div style="display: flex; justify-content: center; align-items: center;">
+    <div class="card" style="width: 20rem; padding: 2rem;">
+        <h5 class="display-4">Login</h5>
+
+
+
+
+
+
+        <form asp-action="Login">
+            <!-- Email input -->
+            <div class="form-outline mb-4">
+                <label class="form-label" for="emailField">Email address</label>
+                <input name="email" type="email" id="emailField" class="form-control" aria-label="Email address"/>
+
+            </div>
+
+            <!-- Password input -->
+            <div class="form-outline mb-4">
+                <label class="form-label" for="passwordField">Password</label>
+                <input name="password" type="password" id="passwordField" class="form-control" aria-label="Password" />
+
+            </div>
+
+            <!-- Submit button -->
+            <button type="submit" class="btn btn-primary btn-block mb-4">Sign in</button>
+
+            <!-- Register buttons -->
+            <div class="text-center">
+                <p>Need an account? <a href="/Auth/Register">Register</a></p>
+
+            </div>
+        </form>
+
+        @if (!String.IsNullOrEmpty(errorMsg?.ToString()))
+        {
+
+            <div class="alert alert-danger">
+
+                @TempData["error"]
+            </div>
+
+        }
+      
+    </div>
+    
+</div>
+

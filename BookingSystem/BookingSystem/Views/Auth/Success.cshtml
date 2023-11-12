@@ -1,0 +1,24 @@
+﻿@{
+    ViewData["Title"] = "Login";
+}
+
+
+@{
+    var userEmail = Context.Session.GetString("currentUser");
+}
+
+
+
+
+<div style="display: flex; justify-content: center; align-items: center;">
+    <div class="card" style="width: 20rem; padding: 2rem;">
+        <h5>Registration successful!</h5>
+        <p>Thank you for signing up! Please use your login details to sign in below</p>
+
+        <a class="btn btn-primary" href="/Auth/Login">Login</a>
+
+
+
+    </div>
+</div>
+

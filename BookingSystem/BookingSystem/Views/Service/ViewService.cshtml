@@ -1,0 +1,307 @@
+﻿@model BookingSystem.ViewModels.ServiceViewModel
+
+@{
+    ViewData["Title"] = "ViewService";
+}
+
+<head>
+    <meta property="og:description" content="@ViewBag.Meta.Description">
+    <meta property="og:site_name" content="@ViewBag.Meta.Sitename">
+    <meta property="og:article:published_time" content="@ViewBag.Meta.PublicedDate">
+    <meta property="og:locale" content="@ViewBag.Meta.Locale">
+    <meta property="og:type" content="@ViewBag.Meta.ContentType">
+</head>
+
+
+<div>
+    <div class="go-back-btn">
+        <a asp-action="Index" asp-controller="Home">Back to List</a>
+    </div>
+    <div class="d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">Your Service</h4>
+        <button id="editBtn" class="btn btn-primary">Edit</button>
+    </div>
+    <hr />
+
+    <form asp-action="UpdateService" asp-controller="Service" method="post">
+        <dl class="row">
+            <dt class="col-sm-2">
+                @Html.HiddenFor(model => model.Service.ID)
+                @Html.HiddenFor(model => model.Service.BookingLimit)
+                @Html.LabelFor(model => model.Service.Name)
+            </dt>
+            <dd class="col-sm-10" id="nameField">
+                <span>@Model.Service.Name</span>
+                @Html.TextBoxFor(model => model.Service.Name, new { @class = "form-control edit-field", style = "display:none;" })
+            </dd>
+            <dt class="col-sm-2">
+                @Html.LabelFor(model => model.Service.Description)
+            </dt>
+            <dd class="col-sm-10" id="descriptionField">
+                <span>@Model.Service.Description</span>
+                @Html.TextBoxFor(model => model.Service.Description, new { @class = "form-control edit-field", style = "display:none;" })
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Service.BookingLimit)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Service.BookingLimit)
+            </dd>
+        </dl>
+        <input type="submit" value="Update Service" class="btn btn-primary edit-field" style="display:none;" />
+    </form>
+</div>
+
+<div>
+    <div class="row align-items-center">
+        <h4 class="col">Users</h4>
+        <button type="button" class="btn btn-primary col-auto" data-bs-toggle="modal" data-bs-target="#addUser">
+            Add User
+        </button>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (User user in Model.UsersForService)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => user.Name)</td>
+                    <td>@Html.DisplayFor(modelItem => user.Email)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    
+</div>
+
+<div>
+    <div class="row align-items-center">
+        <div class="col">
+            <h4>Bookings</h4>
+        </div>
+        <div class="col-auto">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createBookingModal">
+                Create Booking
+            </button>
+        </div>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>User</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var booking in Model.Bookings)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => booking.StartDate)</td>
+                    <td>@Html.DisplayFor(modelItem => booking.EndDate)</td>
+                    <td>@Html.DisplayFor(modelItem => booking.UserName)</td>
+                    <td>
+                        @if (booking.UserID == Model.UserId)
+                        {
+                            <a asp-area="" asp-controller="Service" asp-action="DeleteBooking" asp-route-bookingID="@booking.ID" asp-route-serviceID="@Model.Service.ID">Delete</a>
+                        
+                        }
+                    </td>
+
+                    
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<form asp-controller="Service" asp-action="LeaveService">
+    <input type="hidden" name="serviceID" value="@Model.Service.ID">
+    <button type="submit" class="btn btn-outline-danger leave-btn" >Leave service</button>
+</form>
+
+<!-- Create Booking Modal -->
+<div class="modal fade" id="createBookingModal" tabindex="-1" aria-labelledby="createBookingModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createBookingModalLabel">Create New Booking</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-action="CreateBooking" asp-controller="Service">
+                    <div class="mb-3">
+                        <label for="startDate" class="form-label">Start Date</label>
+                        <input type="datetime-local" class="form-control" id="startDate" name="StartDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="endDate" class="form-label">End Date</label>
+                        <input type="datetime-local" class="form-control" id="endDate" name="EndDate" required>
+                    </div>
+                    <input type="hidden" name="ServiceID" value="@Model.Service.ID">
+                    <p style="width: 100%;"id="errorMessage" class="text-danger"></p>
+                    <button id="createBookingButton" type="submit" class="btn btn-primary">Create Booking</button>
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add person modal -->
+<div class="modal fade" id="addUser" tabindex="-1" aria-labelledby="createServiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createServiceModalLabel">Add user</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-action="addPersonToService" asp-controller="Service" id="createServiceForm">
+                    <!-- Users List -->
+                    <div class="mb-3">
+                        <label class="form-label">Available Users</label>
+                        <select id="availableUsers" class="form-control" multiple size="5">
+                            @foreach (var user in Model.Users)
+                            {
+                                if (!Model.UsersForService.Any(u => u.ID == user.ID)) // Check if the user is already added
+                                {
+                                    <option value="@user.ID">@user.Name</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <!-- Selected Users List -->
+                    <div class="mb-3">
+                        <label class="form-label">Selected Users</label>
+                        <ul id="selectedUsers" class="list-group">
+                            <!-- Selected users will be listed here -->
+                        </ul>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add</button>
+                    <input type="hidden" name="service.ID" value="@Model.Service.ID">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+<script>
+    $(document).ready(function () {
+        $('#addUser').on('click', function () {
+            $('#availableUsers option:selected').each(function () {
+                var userId = $(this).val();
+                var userName = $(this).text();
+                $('#selectedUsers').append('<li style="display: flex; justify-content: space-between;"class="list-group-item" data-id="' + userId + '">' + userName +
+                    ' <button type="button" class="btn btn-danger btn-sm remove-user">Remove</button></li>');
+                $(this).remove();
+            });
+        });
+
+        $('#selectedUsers').on('click', '.remove-user', function () {
+            var userId = $(this).closest('li').data('id');
+            var userName = $(this).closest('li').text().replace(' Remove', '');  // Removing ' Remove' from the text
+            $('#availableUsers').append('<option value="' + userId + '">' + userName + '</option>');
+            $(this).closest('li').remove();
+        });
+
+        $('#createServiceForm').on('submit', function () {
+            $('#selectedUsers li').each(function () {
+                var userId = $(this).data('id');
+                $('#createServiceForm').append('<input type="hidden" name="users" value="' + userId + '" />');
+            });
+        });
+    });
+</script>
+
+
+<script>
+    const hoursBooked = @Model.HoursBooked;
+    const bookingLimit = @Model.Service.BookingLimit;
+    const bookings = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Bookings));
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        const createBookingButton = document.getElementById('createBookingButton');
+        const errorMessageElement = document.getElementById('errorMessage');
+        const today = new Date();
+
+        function isOverlapping(newStart, newEnd, existingStart, existingEnd) {
+            return newStart < existingEnd && newEnd > existingStart;
+        }
+
+        function validateBooking() {
+            const newStartDate = new Date(startDateInput.value);
+            const newEndDate = new Date(endDateInput.value);
+            const timeDifference = newEndDate - newStartDate;
+            const hoursDifference = timeDifference / (1000 * 60 * 60);
+
+            let isOverlap = false;
+            bookings.forEach(booking => {
+                const existingStartDate = new Date(booking.StartDate);
+                const existingEndDate = new Date(booking.EndDate);
+                if (isOverlapping(newStartDate, newEndDate, existingStartDate, existingEndDate)) {
+                    isOverlap = true;
+                }
+            });
+
+            const yearDiff = newStartDate.getFullYear() - today.getFullYear();
+            const monthDiff = newStartDate.getMonth() - today.getMonth();
+            const dayDiff = newStartDate.getDate() - today.getDate();
+            const hourDiff = newStartDate.getHours() - today.getHours();
+
+            const newStartDateisBeforeToday = yearDiff < 0 ||
+                (yearDiff === 0 && (monthDiff < 0 || (monthDiff === 0 && (dayDiff < 0 || (dayDiff === 0 && hourDiff < 0)))));
+
+            if (hoursDifference > bookingLimit - hoursBooked || isOverlap || newStartDate > newEndDate || newStartDateisBeforeToday) {
+                let message = 'The selected time is not available for booking.';
+                if (hoursDifference > bookingLimit - hoursBooked) {
+                    message = 'You have already booked ' + hoursBooked + ' hours this month. You can book ' + (bookingLimit - hoursBooked) + ' more hours according to your limit.';
+                }
+                errorMessageElement.textContent = message;
+
+                createBookingButton.disabled = true;
+            } else {
+                createBookingButton.disabled = false;
+                errorMessageElement.textContent = '';
+            }
+        }
+
+        startDateInput.addEventListener('change', validateBooking);
+        endDateInput.addEventListener('change', validateBooking);
+    });
+</script>
+
+@section Scripts {
+    <script>
+        document.getElementById('editBtn').addEventListener('click', function () {
+            var editFields = document.querySelectorAll('.edit-field');
+            var spans = document.querySelectorAll('#nameField span, #descriptionField span');
+
+            editFields.forEach(function (field) {
+                field.style.display = field.style.display === 'none' ? '' : 'none';
+            });
+
+            spans.forEach(function (span) {
+                span.style.display = span.style.display === 'none' ? '' : 'none';
+            });
+        });
+    </script>
+}
